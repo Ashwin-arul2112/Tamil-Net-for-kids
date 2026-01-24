@@ -1,50 +1,122 @@
-# TamilNet
-Try it for yourself here: [tamilnet.tech](http://tamilnet.tech/)!
+**TamilNet-for Kids**
 
-Recognizes handwritten Tamil characters with 90% accuracy. Credits to HP Labs India for the [training](http://shiftleft.com/mirrors/www.hpl.hp.com/india/research/penhw-resources/tamil-iwfhr06-train.html) and [test](http://shiftleft.com/mirrors/www.hpl.hp.com/india/research/penhw-resources/tamil-iwfhr06-test.html) datasets. This system uses a convolutional neural network (CNN), which is widely used across optical character recognition tasks.
+A child-friendly platform that helps kids learn Tamil alphabets and numbers through interactive handwriting recognition 🎨✍️. The system uses a Convolutional Neural Network (CNN) to recognize handwritten Tamil characters with ~90% accuracy. It also includes a Parent Tracker for monitoring a child’s learning progress.
 
-## Introduction
-Tamil is language originally from the South Indian state of Tamil Nadu. It is predominantly used in South India, Sri Lanka, and Singapore. It is one of the oldest languages in the world and is spoken by over 80 million people worldwide. Tamil uses a non-Latin script; the alphabet consists of 156 characters, including 12 vowels and 23 consonants. Due to the large number of classes and the extreme similarity between certain characters, accurate Tamil character recognition is more challenging than standard Latin character recognition. As with any language, handwritten character recognition is useful in a wide range of applications, including the digitization of legal documents, mail sorting in post offices, and bank check reading.
+Dataset credits: HP Labs India
+[training](http://shiftleft.com/mirrors/www.hpl.hp.com/india/research/penhw-resources/tamil-iwfhr06-train.html) and [test](http://shiftleft.com/mirrors/www.hpl.hp.com/india/research/penhw-resources/tamil-iwfhr06-test.html) datasets. This system uses a convolutional neural network (CNN), which is widely used across optical character recognition tasks..
 
-## Dataset
-The dataset of offline handwritten Tamil characters is taken from HP Labs India. It contains approximately 500 examples of each of the 156 characters, written by native writers in Tamil Nadu, India. For the IWFHR 2006 Tamil Character Recognition Competition, the entire datset was split into separate training (50,683 examples) and test sets (26,926 examples), which were used here. The provided training set was subsequently split into a new training set and a validation set in a 80% to 20% ratio.
+**Introduction :**
 
-The bi-level images are initially provided as TIFF files of various sizes. After being converted to the PNG format, the images were inverted such that the foreground and background were white and black, respectively, and a constant thickening factor was applied. Then, the images were resized such that the longer side length was 48 pixels, using the Lanczos algorithm. The Lanczos algorithm applies anti-aliasing, causing the image to shift from bi-level to grayscale. Finally, the centers of mass of the resulting images were centered on a new 64 x 64 canvas. These images are normalized by transforming each grayscale pixel value from the \[0, 1\] range to the \[-1, 1\] range.
+TamilNet-for Kids is an educational web application designed to make Tamil learning engaging and effective for children.
+Kids can draw Tamil letters and numbers on a digital canvas and instantly see the system recognize them, offering an exciting, game-like learning experience.
 
-## Architecture
-The input is passed into the model as a 64 x 64 image. The model is structures as follows:<br>
-\[1x64x64\] INPUT<br>
-\[16x64x64\] CONV: 16 3x3 filters with stride 1, pad 1<br>
-\[16x64x64\] CONV: 16 3x3 filters with stride 1, pad 1<br>
-\[16x32x32\] MAX POOL: 2x2 filters with stride 2<br>
-\[32x32x32\] CONV: 32 3x3 filters with stride 1, pad 1<br>
-\[32x32x32\] CONV: 32 3x3 filters with stride 1, pad 1<br>
-\[32x16x16\] MAX POOL: 2x2 filters with stride 2<br>
-\[64x16x16\] CONV: 64 3x3 filters with stride 1, pad 1<br>
-\[64x16x16\] CONV: 64 3x3 filters with stride 1, pad 1<br>
-\[64x8x8\] MAX POOL: 2x2 filters with stride 2<br>
-\[1024\] FC: 1024 neurons<br>
-\[512\] FC: 512 neurons<br>
-\[156\] FC: 156 neurons (class neurons)
+Parents can also track their child’s learning performance through the integrated parent tracker dashboard.
 
-Every convolutional and fully connected layer is directly followed by batch normalization and a ReLU activation. 
+**Key Features :**
 
-The architecture I chose was partially inspired by [Handwritten Tamil Recognition using a Convolutional Neural Network](http://alumni.media.mit.edu/~sra/tamil_cnn.pdf) by Prashanth Vijayaraghavan and Misha Sra as well as [Benchmarking on offline Handwritten Tamil Character Recognition using convolutional neural networks](https://doi.org/10.1016/j.jksuci.2019.06.004) by B.R. Kavitha and C. Srimathi. I felt that this architecture was complex enough to fit the data well, while lightweight enough to be deployed in a web application, which was my intended use.
+- 🧒 Child-Friendly Interface: Simple, colorful UI with canvas drawing support.
+- 🧠 CNN-Based Recognition: Detects handwritten Tamil characters and numbers with ~90% accuracy.
+- 🔢 Tamil Numbers Learning: Includes number recognition and learning activities.
+- 👨‍👩‍👧 Parent Tracker: Monitors learning progress, accuracy rate, and time spent practicing.
+- 📊 Real-Time Feedback: Displays recognized characters and confidence levels.
+- 🌐 Web-Based Application: Built using Flask, HTML, CSS, JavaScript, and Bootstrap for responsive design.
 
-## Experiments
-### Training
-Training was done on a GPU via Google Colab. There were several hyperparameters to tune, including but not limited to learning rate, weight decay (L2 regularization penalty), and initialization. Throughout the process, I referred to the online [Notes for CS231n at Stanford](https://cs231n.github.io/) by Andrej Karpathy. I tested applying dropout on all layers as well as on only fully connected layers, but both configurations resulted in lower validation accuracy. Thus, an L2 penalty of 0.003 was chosen. All layers were initialized using Kaiming initialization and the optimizer of choice was Adam, with a learning rate of 0.001.
+**Dataset Setup :**
 
-### Testing
-Testing was also conducted on a Google Colab GPU. The final model achieved 90.7% accuracy on the test set, which was satisfactory for me. As previously mentioned, since there are 156 classes, several of which are very similar to one another, attaining high accuracy is an especially difficult task. Test accuracy was consistently lower than validation accuracy, which suggests that the test set for the competition was deliberately made to be more difficult than the training set.
+To run this project properly, you’ll need to download the official Tamil handwritten dataset from HP Labs India.
 
-## Web App
-The model weights of the final CNN were downloaded in the PyTorch PT format. The web app is a fairly simple one, which uses the Flask micro web framework. It consists of a canvas on which the user draws, as well as buttons to clear the canvas and submit the handwritten character for recognition. The page also includes instructions that detail how to use the tool and suggests a character to draw (primarily aimed towards non-Tamil-speaking users). Several of the elements of the page are implemented using the Bootstrap CSS framework, which provides a more appealing layout and appearance.
+**Steps to Set Up the Dataset :**
 
-The main.js JavaScript file takes care of accepting user input and displaying the model's output. The python scripts then process the data just as it was done during the training and testing processes, with the additional step of finding the bounding box of the character within the canvas to ensure that the character is not too small. The predicted character, along with the model's confidence (obtained using a softmax function), is displayed on the screen.
+Create a folder named data in your project root directory.
 
-## Conclusion
-I really enjoyed working on this project! I was able to develop everything from the neural network to itself to the user-facing web app. It was a great learning experience as well, as there were several bugs and issues (as there are in any project), but I was able to fix the issues or find workarounds. Plus, I was able to refresh my own Tamil writing and reading abilities!
+Download the following datasets from** HP Labs** India:
 
-## Next Steps
-The resulting website can be used in several ways, such as a tool to practice handwriting for both children and adults alike. There are plenty of possible extensions for a project like this. A audio tool could be added, for example, to teach the pronunciation of each written character. The optical character recognition system would be expanded to take in whole words, which would involve character segmentation. The possibilities are truly endless!
+- Training Dataset
+- Test Dataset
+
+Run the preprocessing script to prepare the dataset for training (optional if using pretrained weights).
+
+**Architecture :**
+
+The CNN model processes input images (64x64 pixels) through multiple convolutional layers followed by batch normalization, ReLU activation, and fully connected layers.
+
+**Model Flow :**
+
+- Input (1x64x64) → Conv → Conv → Pool → Conv → Conv → Pool → Conv → Conv → Pool → FC(1024) → FC(512) → FC(156)
+- Each layer is optimized for speed and accuracy, making the model lightweight enough for web deployment.
+
+**Installation & Usage**
+
+1️⃣ Prerequisites
+
+- Python 3.8+
+- Flask
+- PyTorch
+- NumPy
+- OpenCV
+- Bootstrap (CDN)
+
+2️⃣ Run the Application
+# Clone the repository
+git clone https://github.com/your-username/TamilNet-for-Kids.git
+cd TamilNet-for-Kids
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the Flask app
+python app.py
+
+3️⃣ Access in Browser
+
+Open your browser and go to 👉
+http://127.0.0.1:5000/
+
+**How It Works :**
+
+- The child draws a Tamil letter or number on the canvas.
+- The system captures the image and preprocesses it (resizing, normalization, centering).
+- The CNN model predicts the character and displays it with a confidence percentage.
+- Parent Tracker logs accuracy and practice time for performance insights.
+
+
+**Training & Testing :**
+
+Training was performed on Google Colab (GPU) with:
+
+- Optimizer: Adam
+- Learning Rate: 0.001
+- Regularization: L2 (0.003)
+- Initialization: Kaiming
+- Test Accuracy: ~90.7%
+- Validation Accuracy: ~92%
+
+**Future Enhancements :**
+
+- 🔊 Add Tamil letter pronunciation using audio feedback.
+- 🧩 Extend recognition to full Tamil words and sentences.
+- 🎮 Include gamified quizzes and rewards for learning motivation.
+- 📈 Advanced parent dashboards with progress analytics.
+- ❤️ Acknowledgements
+
+HP Labs India for the dataset.
+
+CS231n Notes by Andrej Karpathy for CNN and optimization guidance.
+
+Inspiration from Tamil OCR research papers by Prashanth Vijayaraghavan & B.R. Kavitha.
+
+**Output of Frontend :**
+
+Login:
+<img width="1826" height="887" alt="Screenshot 2025-10-22 110601" src="https://github.com/user-attachments/assets/b91447e8-7fc8-4eec-b159-165b4e19f15f" />
+Signup:
+<img width="1815" height="882" alt="Screenshot 2025-10-22 110614" src="https://github.com/user-attachments/assets/0f0dca50-e38f-4b6a-9162-6bc4f811920f" />
+Practice:
+<img width="1843" height="848" alt="Screenshot 2025-10-22 110655" src="https://github.com/user-attachments/assets/57ea2dea-4178-42be-9712-95eb8e9c2ad8" />
+Tamil numbers:
+<img width="1884" height="907" alt="Screenshot 2025-10-22 110753" src="https://github.com/user-attachments/assets/38e571a0-9505-4832-90b8-5090475e0c31" />
+<img width="1223" height="772" alt="Screenshot 2025-10-22 110811" src="https://github.com/user-attachments/assets/0993893b-f2b9-43bc-945a-e409170e3a3d" />
+Parent tracker:
+<img width="1896" height="903" alt="Screenshot 2025-10-22 110847" src="https://github.com/user-attachments/assets/46436b57-848e-4b61-a600-040caad2f751" />
+
+
